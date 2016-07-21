@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CCSee.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=grimnir;INITIAL CATALOG=CC_HUB4;</Value>
+    </Setting>
+    <Setting Name="ConnectionUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)">User Id=U4_ServicePortal;Password=Access#2016;</Value>
+    </Setting>
+    <Setting Name="ConnectionStringLogTek" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Data Source=grimnir;INITIAL CATALOG=LognetCC;</Value>
+    </Setting>
+    <Setting Name="ConnectionUserLogTek" Type="System.String" Scope="User">
+      <Value Profile="(Default)">User Id=U4_ServicePortal;Password=Access#2016;</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
