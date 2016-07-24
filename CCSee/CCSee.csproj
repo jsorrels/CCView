@@ -46,9 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataGridTab.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="DatGridViewController.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

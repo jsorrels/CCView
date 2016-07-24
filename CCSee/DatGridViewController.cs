@@ -28,7 +28,8 @@ namespace CCSee
         const int MAX_LB_SIZE = 1500;
         bool _bRun = true;                  // True to keep our thread running. 
         private eReferenceType myName ;
-
+        private Form1 _parent = null;
+        BindingSource bindingsource = new BindingSource();
         private System.Windows.Forms.ComboBox cbReferenceNumberType;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btFind;
@@ -159,10 +160,23 @@ namespace CCSee
             }
         }
 
-        public DatGridViewController()
+        public Form1 Parent
         {
-           
-            
+            get
+            {
+                return _parent;
+            }
+
+            set
+            {
+                _parent = value;
+            }
+        }
+
+        public DatGridViewController(Form1 parent)
+        {
+
+            Parent = _parent;
           //  Init();
 
         }
@@ -184,13 +198,15 @@ namespace CCSee
                 CbReferenceNumberType.Items.Add(s);
                 CbReferenceNumberType.SelectedIndex = 0;
             }
+            dgvOut.DataSource = bindingsource;
+            dgvOut.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGreen;
             //CCUSAA00007487
         }
 
 
         public void btFind_Click(object sender, EventArgs e, UENSerchParams sp)
         {
-            this.DgvOut.Rows.Clear();
+            ClearGrid();
             Thread tdRunFillGrid = null;                                 // do this oina  thread so we dont lockup the UI
 
             SqlConnection sqlConnection = new SqlConnection(sFullConnectionString);
@@ -221,14 +237,20 @@ namespace CCSee
                     break;
                 case eReferenceType.OrderNumber:
 
-                    UserOut("Find By Ref");
+                    UserOut("Find By Order");
                     tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindByOrder));                                        // do this oina  thread so we dont lockup the UI
                     tdRunFillGrid.Start(sValue);
                     break;
                 case eReferenceType.InternalReference:
 
-                    UserOut("Find By Order");
+                    UserOut("Find By InternlRef");
                     tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindByInternalRef));                                        // do this oina  thread so we dont lockup the UI
+                    tdRunFillGrid.Start(sValue);
+                    break;
+                case eReferenceType.Account:
+
+                    UserOut("Find By Account");
+                    tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindByAccount));                                        // do this oina  thread so we dont lockup the UI
                     tdRunFillGrid.Start(sValue);
                     break;
 
@@ -239,7 +261,7 @@ namespace CCSee
         {
             string sInternalRef = (string)o;
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
-            BindingSource bindingSource = new BindingSource();
+          //  BindingSource bindingSource = new BindingSource();
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
             List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
           
@@ -284,11 +306,13 @@ namespace CCSee
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = sqlConnection;
                     sqlConnection.Open();
-
+                    ClearGrid();
                     reader = cmd.ExecuteReader();
-
+                    AddReaderRows(reader);
+                    reader = cmd.ExecuteReader();
+                    
                     {
-
+                    /*
                         // build the columns
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
@@ -318,10 +342,10 @@ namespace CCSee
                                 {
 
                                     dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-
+                                //    UserOut("Adding row: " + reader[i].ToString());
 
                                 }
-                                UserOut("Adding row: ");
+                              //  UserOut("Adding row: ");
                                 ldr.Add(dgvr);
 
                                 // AddRow(dgvr);
@@ -333,7 +357,7 @@ namespace CCSee
                             AddDGVRows(ldr);
                         }
 
-
+                        */
                         sqlConnection.Close();
 
                     }
@@ -351,6 +375,125 @@ namespace CCSee
             }
 
         }
+        public void FindByAccount(object o)
+        {
+            string sAccount = (string)o;
+
+
+
+            SqlDataAdapter dataAdapter = new SqlDataAdapter();
+     
+
+            List<DataGridViewRow> ldr = new List<DataGridViewRow>();
+            List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
+
+            lock (oThreadLock)
+            {
+
+                try
+                {
+                    SqlConnection sqlConnection = new SqlConnection(sFullConnectionString);
+                    SqlCommand cmd = new SqlCommand();
+                    SqlDataReader reader = null;
+
+
+
+                    string sDate = DateTime.Now.Date.ToString("M/d/yyyy");
+
+
+                    cmd.CommandText = @"
+
+              
+ 
+                    SELECT *
+                    FROM
+                      
+                         CC_HUB4.dbo.ufn_GetPreviousReferenceRecognized(GETDATE(),DateAdd(d, 1, GETDATE()),'N') U4
+                     WHERE
+                              U4.BillingID  =  '"
+                     + sAccount
+                     + @" ' ORDER BY BillingID, Usage, LegacyAccount ";                   
+                      
+
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = sqlConnection;
+                    sqlConnection.Open();
+                    ClearGrid();
+                    reader = cmd.ExecuteReader();
+                    AddReaderRows(reader);
+                   // ClearGrid();
+                    /*
+
+                    // build the columns
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        //columns.Add(reader.GetName(i));
+                        DataGridViewColumn newCol = new DataGridViewColumn(); // add a column to the grid
+                        DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
+                        newCol.CellTemplate = cell;
+
+                        newCol.HeaderText = reader.GetName(i);
+                        newCol.Name = reader.GetName(i);
+                        newCol.Visible = true;
+                        //   newCol.Width = 40;
+
+                        ldc.Add(newCol);
+                        // AddCol(newCol);
+
+                    }
+                    AddDGVCols(ldc);
+
+                    UserOut("Done building columns");
+                    // execute the reader
+                    if (reader.FieldCount > 0)
+                    {
+                        UserOut("building rows.....\n\n");
+                        DataGridViewRow dgvr = null;
+                        while (reader.Read())
+                        {
+                            dgvr = new DataGridViewRow();
+                            //   StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+
+                                //    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
+                                //     sb.Append(" " + reader[i].ToString());
+                                dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
+                                //     UserOut("Adding row: " + reader[i].ToString());
+
+
+
+                            }
+
+                            ldr.Add(dgvr);
+
+                            // AddRow(dgvr);
+                            System.Threading.Thread.Sleep(10);
+                            //   var columns = new List<string>();
+
+                        }
+                        AddDGVRows(ldr);
+
+                        UserOut("Done building rows");
+
+                    }
+                    */
+                    //AddDGVRows(ldr);
+                    sqlConnection.Close();
+
+                }
+
+                catch (Exception ex)
+                {
+                    UserOut("TagID: " + sAccount + " Exception retrieving data :" + ex.Message);
+                    // return null;
+                }
+
+
+            }
+
+
+        }
         public void FindByOrder(object o)
         {
 
@@ -359,7 +502,7 @@ namespace CCSee
 
 
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
-            BindingSource bindingSource = new BindingSource();
+            //BindingSource bindingSource = new BindingSource();
 
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
             List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
@@ -403,11 +546,12 @@ namespace CCSee
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = sqlConnection;
                     sqlConnection.Open();
-
-                    reader = cmd.ExecuteReader();
-
+                  
                     ClearGrid();
+                    reader = cmd.ExecuteReader();
+                    AddReaderRows(reader);
 
+                    /*
 
                     // build the columns
                     for (int i = 0; i < reader.FieldCount; i++)
@@ -432,22 +576,24 @@ namespace CCSee
                     // execute the reader
                     if (reader.FieldCount > 0)
                     {
+                        UserOut("building rows.....\n\n");
                         DataGridViewRow dgvr = null;
                         while (reader.Read())
                         {
                             dgvr = new DataGridViewRow();
-                            StringBuilder sb = new StringBuilder();
+                         //   StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
 
                                 //    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
                                 //     sb.Append(" " + reader[i].ToString());
                                 dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
+                           //     UserOut("Adding row: " + reader[i].ToString());
 
 
 
                             }
-                            UserOut("Adding row: " + sb.ToString());
+                           
                             ldr.Add(dgvr);
 
                             // AddRow(dgvr);
@@ -460,7 +606,7 @@ namespace CCSee
                         UserOut("Done building rows");
 
                     }
-
+                    */
                     //AddDGVRows(ldr);
                     sqlConnection.Close();
 
@@ -484,7 +630,7 @@ namespace CCSee
             string sTag = sp.SRef;
             //  CCLastObj oRet = new CCLastObj();
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
-            BindingSource bindingSource = new BindingSource();
+            
             //   SqlDataAdapter dataAdapter = null;
             ClearGrid();
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
@@ -591,7 +737,9 @@ namespace CCSee
                     sqlConnection.Open();
 
                     reader = cmd.ExecuteReader();
-
+                    AddReaderRows(reader);
+                   
+                    /*
                     // build the columns
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
@@ -635,10 +783,10 @@ namespace CCSee
 
                         }
                         AddDGVRows(ldr);
+                       
 
 
-
-                    }
+                    } */
 
                     // AddDGVRows(ldr);
                     sqlConnection.Close();
@@ -686,6 +834,19 @@ namespace CCSee
 
 
         }
+        public void AddReaderRows(SqlDataReader r)
+        {
+            if (DgvOut.InvokeRequired)
+            {
+                DgvOut.Invoke((MethodInvoker)delegate ()
+                {
+
+                    bindingsource.DataSource = r ;
+                    DgvOut.Refresh();
+                });
+            }
+        }
+
         public void AddDGVRows(List<DataGridViewRow> dgvr)
         {
             if (DgvOut.InvokeRequired)
