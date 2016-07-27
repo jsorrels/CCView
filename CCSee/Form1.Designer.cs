@@ -1,4 +1,6 @@
-﻿namespace CCSee
+﻿using System.Windows.Forms;
+
+namespace CCSee
 {
     partial class Form1
     {
@@ -769,6 +771,7 @@
         private System.Windows.Forms.Button btFind;
         private System.Windows.Forms.TextBox tbRefValue;
         private System.Windows.Forms.ListBox lbOutput;
+      //  private System.Windows.Forms.ListBox LbOutput;
         private System.Windows.Forms.TabPage Orders;
         private System.Windows.Forms.TextBox textBoxTab5;
         private System.Windows.Forms.Button buttonTab5;
@@ -810,6 +813,21 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox comboBoxTab6;
         private System.Windows.Forms.DataGridView dataGridViewTab6;
+
+      
+
+        public ListBox LbOutput
+        {
+            get
+            {
+                return lbOutput;
+            }
+
+            set
+            {
+                lbOutput = value;
+            }
+        }
     }
 }
 

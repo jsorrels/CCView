@@ -62,7 +62,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.InternalReference).TbRefValue = textBoxTab1;
             lViewControllers.ElementAt((int)eReferenceType.InternalReference).BtFind = buttonTab1;
             lViewControllers.ElementAt((int)eReferenceType.InternalReference).DgvOut = dgvOut;
-            lViewControllers.ElementAt((int)eReferenceType.InternalReference).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.InternalReference).dgLbOutput = LbOutput;
             lViewControllers.ElementAt((int)eReferenceType.InternalReference).MyName = eReferenceType.InternalReference;
             lViewControllers.ElementAt((int)eReferenceType.InternalReference).Init();
 
@@ -77,7 +77,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).TbRefValue = textBoxTab2;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).BtFind = button4;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).DgvOut = dataGridViewTab2;
-            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).dgLbOutput = LbOutput;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).MyName = eReferenceType.UEN_AssetBillingHistory;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetBillingHistory).Init();
             comboBoxTab2.Enabled = false;
@@ -90,7 +90,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).TbRefValue = textBoxTab3;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).BtFind = buttonTab3;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).DgvOut = dataGridViewTab3;
-            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).dgLbOutput = LbOutput;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).MyName = eReferenceType.UEN_AssetStateHistory;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetStateHistory).Init();
             comboBoxTab3.Enabled = false;
@@ -104,7 +104,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).TbRefValue = textBoxTab4;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).BtFind = buttonTab4;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).DgvOut = dataGridViewTab4;
-            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).dgLbOutput = LbOutput;
 
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).MyName = eReferenceType.UEN_AssetEventHistory;
             lViewControllers.ElementAt((int)eReferenceType.UEN_AssetEventHistory).Init();
@@ -119,7 +119,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.OrderNumber).TbRefValue = textBoxTab5;
             lViewControllers.ElementAt((int)eReferenceType.OrderNumber).BtFind = buttonTab5;
             lViewControllers.ElementAt((int)eReferenceType.OrderNumber).DgvOut = dataGridViewTab5;
-            lViewControllers.ElementAt((int)eReferenceType.OrderNumber).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.OrderNumber).dgLbOutput = LbOutput;
             lViewControllers.ElementAt((int)eReferenceType.OrderNumber).MyName = eReferenceType.OrderNumber;
             lViewControllers.ElementAt((int)eReferenceType.OrderNumber).Init();
             comboBoxTab5.Enabled = false;
@@ -133,7 +133,7 @@ namespace CCSee
             lViewControllers.ElementAt((int)eReferenceType.Account).TbRefValue = textBoxTab6;
             lViewControllers.ElementAt((int)eReferenceType.Account).BtFind = buttonTab6;
             lViewControllers.ElementAt((int)eReferenceType.Account).DgvOut = dataGridViewTab6;
-            lViewControllers.ElementAt((int)eReferenceType.Account).LbOutput = lbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.Account).dgLbOutput = LbOutput;
             lViewControllers.ElementAt((int)eReferenceType.Account).MyName = eReferenceType.Account;
             lViewControllers.ElementAt((int)eReferenceType.Account).Init();
             comboBoxTab6.Enabled = false;
@@ -327,6 +327,7 @@ namespace CCSee
                 case ("AssetID"):
                 case ("assetID"):
                 case ("assetid"):
+                case ("ArchiveAssetID"):
                     foreach (DatGridViewController d in lViewControllers)
                     {
 

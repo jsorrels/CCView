@@ -42,10 +42,17 @@ namespace CCSee
         private System.Windows.Forms.DataGridView dgvOut;
         private System.Windows.Forms.ListBox lbOutput;
         private System.Windows.Forms.TabControl tabControl1;
+        private DataGridView dataGridView2;
+
         // private System.Windows.Forms.TabPage tabPage1;
         //   private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView dataGridView1;
 
+        public  DataGridTab()
+        {
+           
+
+        }
 
         public eReferenceType MyName
         {
@@ -165,14 +172,7 @@ namespace CCSee
             }
         }
 
-        public DataGridTab()
-        {
-
-
-            //  Init();
-
-        }
-
+       
         public void Init()
         {
             //  Lee's sample string - sConnectionString = String.Concat("Data Source=GREYJOY\\GREYJOY_SQL;INITIAL CATALOG=CC_HUB4;", "User Id=U4_ServicePortal;Password=Access#2016; Trusted_Connection=False;");
@@ -324,10 +324,10 @@ namespace CCSee
                                 {
 
                                     dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-
+                                   // UserOut("Adding row: " + reader[i].ToString());
 
                                 }
-                                UserOut("Adding row: ");
+                              //  UserOut("Adding row: ");
                                 ldr.Add(dgvr);
 
                                 // AddRow(dgvr);
@@ -438,22 +438,23 @@ namespace CCSee
                     // execute the reader
                     if (reader.FieldCount > 0)
                     {
+                        UserOut("building rows.....");
                         DataGridViewRow dgvr = null;
                         while (reader.Read())
                         {
                             dgvr = new DataGridViewRow();
-                            StringBuilder sb = new StringBuilder();
+                         //   StringBuilder sb = new StringBuilder();
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
 
                                 //    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
                                 //     sb.Append(" " + reader[i].ToString());
                                 dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-
+                     //           UserOut("Adding row: " + reader[i].ToString());
 
 
                             }
-                            UserOut("Adding row: " + sb.ToString());
+                        //    UserOut("Adding row: " + sb.ToString());
                             ldr.Add(dgvr);
 
                             // AddRow(dgvr);
@@ -627,17 +628,15 @@ namespace CCSee
                             dgvr = new DataGridViewRow();
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
-                                //columns.Add(reader.GetName(i));
-
+                               
                                 //    DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
                                 dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //   newCol.Width = 40;
+                               
 
                             }
                             ldr.Add(dgvr);
 
-                            //  AddRow(dgvr);
-                            //   var columns = new List<string>();
+                           
 
                         }
                         AddDGVRows(ldr);
@@ -646,7 +645,6 @@ namespace CCSee
 
                     }
 
-                    // AddDGVRows(ldr);
                     sqlConnection.Close();
 
                 }
@@ -654,7 +652,7 @@ namespace CCSee
                 catch (Exception ex)
                 {
                     UserOut("TagID: " + sTag + " Exception retrieving data :" + ex.Message);
-                    // return null;
+                
                 }
 
             }
@@ -863,6 +861,31 @@ namespace CCSee
         }
 
         public void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void InitializeComponent()
+        {
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // dataGridView2
+            // 
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView2.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowTemplate.Height = 33;
+            this.dataGridView2.Size = new System.Drawing.Size(240, 150);
+            this.dataGridView2.TabIndex = 0;
+            this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }

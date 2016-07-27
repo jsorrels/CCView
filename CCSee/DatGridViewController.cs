@@ -5,10 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Data;
@@ -37,8 +34,7 @@ namespace CCSee
         private System.Windows.Forms.DataGridView dgvOut;
         private System.Windows.Forms.ListBox lbOutput;
         private System.Windows.Forms.TabControl tabControl1;
-       // private System.Windows.Forms.TabPage tabPage1;
-     //   private System.Windows.Forms.TabPage tabPage2;
+    
         private System.Windows.Forms.DataGridView dataGridView1;
 
 
@@ -119,7 +115,7 @@ namespace CCSee
             }
         }
 
-        public ListBox LbOutput
+        public ListBox dgLbOutput
         {
             get
             {
@@ -200,10 +196,25 @@ namespace CCSee
             }
             dgvOut.DataSource = bindingsource;
             dgvOut.AlternatingRowsDefaultCellStyle.BackColor = Color.LightGreen;
+            dgvOut.RowsDefaultCellStyle.BackColor = Color.LightGray;
+            dgvOut.DefaultCellStyle.SelectionBackColor = Color.White;
+            dgvOut.DefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvOut.RowHeadersDefaultCellStyle.SelectionBackColor = Color.LightSalmon;
+            dgvOut.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvOut.MultiSelect = true;
+            dgvOut.BorderStyle = BorderStyle.Fixed3D;
+
+            //  dgvOut.DefaultCellStyle.SelectionBackColor = Color.Red;
+            //  dgvOut.DefaultCellStyle.SelectionForeColor = Color.Black;
+
+            //   dgvOut.DefaultCellStyle.Font.FontFamily, 25, FontStyle.Bold
             //CCUSAA00007487
         }
 
+        public void ProcessRequest(UENSerchParams sp)
+        {
 
+        }
         public void btFind_Click(object sender, EventArgs e, UENSerchParams sp)
         {
             ClearGrid();
@@ -261,7 +272,7 @@ namespace CCSee
         {
             string sInternalRef = (string)o;
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
-          //  BindingSource bindingSource = new BindingSource();
+      
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
             List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
           
@@ -275,100 +286,77 @@ namespace CCSee
                     SqlCommand cmd = new SqlCommand();
                     SqlDataReader reader;
 
+                  
+/*
+                    hdr.transactiondate,
+	                hdr.transactionsetid,
+	                hdr.internalreference,
+	                hdr.sourcelocation,
+	                hdr.destinationlocation,
+	                hdr.actiontype,
+	                hdr.created,
+*/
 
-
-                    string sDate = DateTime.Now.Date.ToString("M/d/yyyy");
+                    string sDate = DateTime.Now.Date.ToString("M /d/yyyy");
 
                     cmd.CommandText = @"select
-	                dtl.assetbillingid,
-	                dtl.assetid,
+                    hdr.AutomationID,
+                    hdr.transactionsetid,
+                 	dl.assetbillingid,
+	                dl.assetid,
+                    hdr.actionreference as ActionReference,
+                    hdr.revision as LogTekRev,
+                    dtl.revision as ArchiveRev,
+                    dtl.AssetID as ArchiveAssetID,
+
+                   -- hdr.Quantity,
+                    hdr.shelfaverage,
 	                hdr.transactiondate,
 	                hdr.transactionsetid,
 	                hdr.internalreference,
 	                hdr.sourcelocation,
 	                hdr.destinationlocation,
 	                hdr.actiontype,
-	                hdr.created
-	                --ash.*
+	                hdr.created 
+
+	                
                 from
 	                dbadmin.dbo.logtekauto_header hdr 
-	                join dbadmin.dbo.logtekauto_detail dtl
-		                on dtl.transactionsetid = hdr.transactionsetid and dtl.equipmentid = hdr.equipmentid
+             left join dbadmin.dbo.logtekauto_detail dl
+		            on dl.transactionsetid = hdr.transactionsetid 
+	             left join dbadmin.dbo.logtekauto_archive dtl
+		               on dtl.transactionsetid = hdr.transactionsetid 
 		        
                 where
 
 	                hdr.internalreference = '"
                                      + sInternalRef
-                                     + @" 'and dtl.equipmentid = 150  ";
+                                     + @" ' ";
 
 
 
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = sqlConnection;
                     sqlConnection.Open();
+
                     ClearGrid();
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
-                    reader = cmd.ExecuteReader();
-                    
-                    {
-                    /*
-                        // build the columns
-                        for (int i = 0; i < reader.FieldCount; i++)
-                        {
-                            //columns.Add(reader.GetName(i));
-                            DataGridViewColumn newCol = new DataGridViewColumn(); // add a column to the grid
-                            DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
-                            newCol.CellTemplate = cell;
+                
+                   
+                    sqlConnection.Close();
 
-                            newCol.HeaderText = reader.GetName(i);
-                            newCol.Name = reader.GetName(i);
-                            newCol.Visible = true;
-                            //   newCol.Width = 40;
-
-                            ldc.Add(newCol);
-                            // AddCol(newCol);
-
-                        }
-                        AddDGVCols(ldc);
-                        // execute the reader
-                        if (reader.FieldCount > 0)
-                        {
-                            DataGridViewRow dgvr = null;
-                            while (reader.Read())
-                            {
-                                dgvr = new DataGridViewRow();
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-
-                                    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //    UserOut("Adding row: " + reader[i].ToString());
-
-                                }
-                              //  UserOut("Adding row: ");
-                                ldr.Add(dgvr);
-
-                                // AddRow(dgvr);
-                                //   var columns = new List<string>();
-
-                            }
-
-
-                            AddDGVRows(ldr);
-                        }
-
-                        */
-                        sqlConnection.Close();
-
-                    }
+                   
 
                 }
 
                 catch (Exception ex)
                 {
-                    //
+                   
+
                     UserOut("TagID: " + sInternalRef + " Exception retrieving data :" + ex.Message);
-                    // return null;
+                   
+
                 }
 
 
@@ -418,67 +406,15 @@ namespace CCSee
                     cmd.CommandType = CommandType.Text;
                     cmd.Connection = sqlConnection;
                     sqlConnection.Open();
+
                     ClearGrid();
+                  //  startWaitingThread();
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
-                   // ClearGrid();
-                    /*
-
-                    // build the columns
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        //columns.Add(reader.GetName(i));
-                        DataGridViewColumn newCol = new DataGridViewColumn(); // add a column to the grid
-                        DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
-                        newCol.CellTemplate = cell;
-
-                        newCol.HeaderText = reader.GetName(i);
-                        newCol.Name = reader.GetName(i);
-                        newCol.Visible = true;
-                        //   newCol.Width = 40;
-
-                        ldc.Add(newCol);
-                        // AddCol(newCol);
-
-                    }
-                    AddDGVCols(ldc);
-
-                    UserOut("Done building columns");
-                    // execute the reader
-                    if (reader.FieldCount > 0)
-                    {
-                        UserOut("building rows.....\n\n");
-                        DataGridViewRow dgvr = null;
-                        while (reader.Read())
-                        {
-                            dgvr = new DataGridViewRow();
-                            //   StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-
-                                //    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //     sb.Append(" " + reader[i].ToString());
-                                dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //     UserOut("Adding row: " + reader[i].ToString());
+                  //  stopWaitingThread();
 
 
 
-                            }
-
-                            ldr.Add(dgvr);
-
-                            // AddRow(dgvr);
-                            System.Threading.Thread.Sleep(10);
-                            //   var columns = new List<string>();
-
-                        }
-                        AddDGVRows(ldr);
-
-                        UserOut("Done building rows");
-
-                    }
-                    */
-                    //AddDGVRows(ldr);
                     sqlConnection.Close();
 
                 }
@@ -502,7 +438,7 @@ namespace CCSee
 
 
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
-            //BindingSource bindingSource = new BindingSource();
+       
 
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
             List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
@@ -551,63 +487,9 @@ namespace CCSee
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
 
-                    /*
-
-                    // build the columns
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        //columns.Add(reader.GetName(i));
-                        DataGridViewColumn newCol = new DataGridViewColumn(); // add a column to the grid
-                        DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
-                        newCol.CellTemplate = cell;
-
-                        newCol.HeaderText = reader.GetName(i);
-                        newCol.Name = reader.GetName(i);
-                        newCol.Visible = true;
-                        //   newCol.Width = 40;
-
-                        ldc.Add(newCol);
-                        // AddCol(newCol);
-
-                    }
-                    AddDGVCols(ldc);
-
-                    UserOut("Done building columns");
-                    // execute the reader
-                    if (reader.FieldCount > 0)
-                    {
-                        UserOut("building rows.....\n\n");
-                        DataGridViewRow dgvr = null;
-                        while (reader.Read())
-                        {
-                            dgvr = new DataGridViewRow();
-                         //   StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-
-                                //    dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //     sb.Append(" " + reader[i].ToString());
-                                dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                           //     UserOut("Adding row: " + reader[i].ToString());
+                   
 
 
-
-                            }
-                           
-                            ldr.Add(dgvr);
-
-                            // AddRow(dgvr);
-                            System.Threading.Thread.Sleep(10);
-                            //   var columns = new List<string>();
-
-                        }
-                        AddDGVRows(ldr);
-
-                        UserOut("Done building rows");
-
-                    }
-                    */
-                    //AddDGVRows(ldr);
                     sqlConnection.Close();
 
                 }
@@ -628,10 +510,12 @@ namespace CCSee
            
        
             string sTag = sp.SRef;
-            //  CCLastObj oRet = new CCLastObj();
+          
+
             SqlDataAdapter dataAdapter = new SqlDataAdapter();
             
-            //   SqlDataAdapter dataAdapter = null;
+        
+
             ClearGrid();
             List<DataGridViewRow> ldr = new List<DataGridViewRow>();
             List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
@@ -739,56 +623,8 @@ namespace CCSee
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
                    
-                    /*
-                    // build the columns
-                    for (int i = 0; i < reader.FieldCount; i++)
-                    {
-                        //columns.Add(reader.GetName(i));
-                        DataGridViewColumn newCol = new DataGridViewColumn(); // add a column to the grid
-                        DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
-                        newCol.CellTemplate = cell;
+                    
 
-                        newCol.HeaderText = reader.GetName(i);
-                        newCol.Name = reader.GetName(i);
-                        newCol.Visible = true;
-                        //   newCol.Width = 40;
-                        ldc.Add(newCol);
-                        // AddCol(newCol);
-
-                    }
-                    AddDGVCols(ldc);
-
-
-
-                    // execute the reader
-                    if (reader.FieldCount > 0)
-                    {
-                        DataGridViewRow dgvr = null;
-                        while (reader.Read())
-                        {
-                            dgvr = new DataGridViewRow();
-                            for (int i = 0; i < reader.FieldCount; i++)
-                            {
-                                //columns.Add(reader.GetName(i));
-
-                                //    DataGridViewCell cell = new DataGridViewTextBoxCell();//Specify which type of cell in this column
-                                dgvr.Cells.Add(new DataGridViewTextBoxCell { Value = reader[i] });
-                                //   newCol.Width = 40;
-
-                            }
-                            ldr.Add(dgvr);
-
-                            //  AddRow(dgvr);
-                            //   var columns = new List<string>();
-
-                        }
-                        AddDGVRows(ldr);
-                       
-
-
-                    } */
-
-                    // AddDGVRows(ldr);
                     sqlConnection.Close();
 
                 }
@@ -796,44 +632,16 @@ namespace CCSee
                 catch (Exception ex)
                 {
                     UserOut("TagID: " + sTag + " Exception retrieving data :" + ex.Message);
-                    // return null;
+                    
+
                 }
 
             }
 
 
         }
-        public void AddCol(DataGridViewColumn c)
-        {
-            if (DgvOut.InvokeRequired)
-            {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-                {
-                    DgvOut.Columns.Add(c);
-
-                });
-            }
-            else
-                DgvOut.Columns.Add(c);
-
-        }
-        public void AddRow(DataGridViewRow r)
-        {
-            if (DgvOut.InvokeRequired)
-            {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-
-                {
-                    DgvOut.Rows.Add(r);
-
-                });
-            }
-            else
-                DgvOut.Rows.Add(r);
 
 
-
-        }
         public void AddReaderRows(SqlDataReader r)
         {
             if (DgvOut.InvokeRequired)
@@ -841,71 +649,26 @@ namespace CCSee
                 DgvOut.Invoke((MethodInvoker)delegate ()
                 {
 
-                    bindingsource.DataSource = r ;
+                    bindingsource.DataSource = r;
+                    DgvOut.ClearSelection();
                     DgvOut.Refresh();
                 });
-            }
-        }
 
-        public void AddDGVRows(List<DataGridViewRow> dgvr)
-        {
-            if (DgvOut.InvokeRequired)
-            {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-                {
-
-                    foreach (DataGridViewRow r in dgvr)
-                    {
-                        DgvOut.Rows.Add(r);
-                        if ((dgvr.IndexOf(r)) %2 == 0)
-                        {
-                            r.DefaultCellStyle.BackColor = Color.LightGreen;
-                        }
-                    }
-
-                });
             }
             else
-                foreach (DataGridViewRow r in dgvr)
-                {
-                    DgvOut.Rows.Add(r);
-                }
-
-
-        }
-        public void AddDGVCols(List<DataGridViewColumn> dgvc)
-        {
-            if (DgvOut.InvokeRequired)
             {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-                {
-
-                    foreach (DataGridViewColumn r in dgvc)
-                    {
-                        DgvOut.Columns.Add(r);
-                    }
-
-                });
+                bindingsource.DataSource = r;
+                DgvOut.ClearSelection();
+                DgvOut.Refresh();
             }
-            else
-                foreach (DataGridViewColumn c in dgvc)
-                {
-                    DgvOut.Columns.Add(c);
-
-                }
-
-
         }
+       
         public void ClearGrid()
         {
             if (DgvOut.InvokeRequired)
             {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-                {
-                    DgvOut.Rows.Clear();
-                    DgvOut.Columns.Clear();
-
-                });
+                DgvOut.Invoke(new MethodInvoker(delegate () { ClearGrid(); }));
+               
             }
             else
             {
@@ -925,10 +688,10 @@ namespace CCSee
 
             {
 
-                LbOutput.Items.Insert(0, s);
-                if (LbOutput.Items.Count > MAX_LB_SIZE)
+                dgLbOutput.Items.Insert(0, s);
+                if (dgLbOutput.Items.Count > MAX_LB_SIZE)
                 {
-                    LbOutput.Items.RemoveAt(LbOutput.Items.Count - 1);                                                  // lets not explode
+                    dgLbOutput.Items.RemoveAt(dgLbOutput.Items.Count - 1);                                                  // lets not explode
                 }
             }
 
@@ -994,6 +757,7 @@ namespace CCSee
                 case ("AssetID"):
                 case ("assetID"):
                 case ("assetid"):
+                case ("ArchiveAssetID"):
                     UserOut("Find By UEN: " + s);
                     tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindLastLeasor));                                        // do this oina  thread so we dont lockup the UI
 
@@ -1017,6 +781,47 @@ namespace CCSee
 
         }
 
+        private void startWaitingThread()
+        {
+            _bRun = true;
+            Thread wt = new Thread(waitingThread);
+            wt.Start();
+
+        }
+        private void stopWaitingThread()
+        {
+            _bRun = false;
+
+
+        }
+        private void waitingThread()
+        {
+
+            char[] caSpinner = new char[] { '-','\\','|','/'};
+
+            while (_bRun)
+            {
+                if (TbRefValue.InvokeRequired)
+                    TbRefValue.Invoke(new MethodInvoker(delegate () { waitingThread(); }));                                            // if we are on a different thread
+                else
+
+                {
+                    for (int i = 0; i < caSpinner.Length; i++)
+                    {
+                        TbRefValue.BackColor = Color.Red;
+                        //   DgvOut.Border    = Color.Red;
+                        TbRefValue.BorderStyle = BorderStyle.FixedSingle;
+
+                        Thread.Sleep(1000);
+                        TbRefValue.BackColor = Color.Green;
+                        TbRefValue.BorderStyle = BorderStyle.Fixed3D;
+                        Thread.Sleep(1000);
+                        //DgvOut.
+                    }                                             
+                   
+                }
+            }
+        }
         public void Form1_Load(object sender, EventArgs e)
         {
 
