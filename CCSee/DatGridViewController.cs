@@ -11,7 +11,7 @@ using System.Threading;
 using System.Data;
 
 namespace CCSee
-
+  //  User Id=U4_ServicePortal;Password=Access#2016;
 
 {
     class DatGridViewController 
@@ -302,6 +302,7 @@ namespace CCSee
                     cmd.CommandText = @"select
                     hdr.AutomationID,
                     hdr.transactionsetid,
+                    
                  	dl.assetbillingid,
 	                dl.assetid,
                     hdr.actionreference as ActionReference,
@@ -331,7 +332,9 @@ namespace CCSee
 
 	                hdr.internalreference = '"
                                      + sInternalRef
-                                     + @" ' ";
+                                     + @" ' AND hdr.equipmentID = 150";
+
+
 
 
 
@@ -467,7 +470,7 @@ namespace CCSee
                       BillingSequence,
                       PriorLocation,
                       Location,
-                      PriorBillingResponsibility
+                      PriorBillingResponsibility,
                       BillingResponsibility,
                       PriorBillingUsage,
                       BillingUsage,
@@ -545,7 +548,7 @@ namespace CCSee
                                      BillingSequence,
                                      PriorLocation,
                                      Location,
-                                     PriorBillingResponsibility
+                                     PriorBillingResponsibility,
                                      BillingResponsibility,
                                      PriorBillingUsage,
                                      BillingUsage,
