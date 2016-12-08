@@ -12,6 +12,9 @@ namespace CCSee
         private EventArgs ev;
         private eReferenceType eTypeOfSearch;
        private string sRef;
+        private string sDate;
+        private string eDate;
+
 
         public object Sender1
         {
@@ -62,6 +65,32 @@ namespace CCSee
             set
             {
                 sRef = value;
+            }
+        }
+
+        public string SDate
+        {
+            get
+            {
+                return sDate;
+            }
+
+            set
+            {
+                sDate = value;
+            }
+        }
+
+        public string EDate
+        {
+            get
+            {
+                return eDate;
+            }
+
+            set
+            {
+                eDate = value;
             }
         }
 

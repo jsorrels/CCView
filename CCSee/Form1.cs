@@ -21,7 +21,8 @@ namespace CCSee
         UEN_AssetStateHistory,
         OrderNumber,
         InternalReference,
-        Account
+        Account,
+        OnOFF
 
     }
 
@@ -140,6 +141,25 @@ namespace CCSee
             comboBoxTab6.SelectedIndex = (int)eReferenceType.Account;
             lViewControllers.ElementAt((int)eReferenceType.Account).TbRefValue.Text = "0158";
             lViewControllers.ElementAt((int)eReferenceType.Account).DgvOut.ClearSelection();
+
+
+            // set up tab 7
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).CbReferenceNumberType = comboBoxTab7;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).TbRefValue = textBoxTab7;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).BtFind = buttonTab7;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).DgvOut = dataGridViewTab7;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).dgLbOutput = LbOutput;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).MyName = eReferenceType.OnOFF;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).Init();
+            comboBoxTab7.Enabled = false;
+            comboBoxTab7.SelectedIndex = (int)eReferenceType.OnOFF;
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).TbRefValue.Text = "0010";
+            lViewControllers.ElementAt((int)eReferenceType.OnOFF).DgvOut.ClearSelection();
+
+
+            DateTime dtThirtyDayssAgo = DateTime.Now - new TimeSpan(30, 0, 0, 0);
+            tbStartDate.Text = dtThirtyDayssAgo.Date.ToString("M/d/yyyy");
+            tbEndDate.Text = DateTime.Now.Date.ToString("M/d/yyyy");
 
 
         }
@@ -427,5 +447,41 @@ namespace CCSee
                 }
             }
         }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+            // on amd offs
+            foreach (DatGridViewController d in lViewControllers)
+            {
+                
+                if (d.MyName == eReferenceType.OnOFF)
+                {
+                    UENSerchParams sp = new UENSerchParams(sender, e, eReferenceType.OnOFF);
+                    sp.SRef = d.TbRefValue.Text;
+                    sp.EDate = tbEndDate.Text;
+                    sp.SDate = tbStartDate.Text;
+                    d.btFind_Click(sender, e, sp);
+
+                }
+            }
+
+            /*USE [CC_HUB4]
+            GO
+
+            DECLARE	@return_value int
+            EXEC	@return_value = [dbo].[usp_AccountOnsAndOffs]
+            @Account = '0010',
+            @StartDate = '6/30/2016',
+            @EndDate = NULL
+
+            GO */
+
+        }
+
+        private void label10_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+ 

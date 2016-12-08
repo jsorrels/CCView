@@ -37,6 +37,7 @@ namespace CCSee
     
         private System.Windows.Forms.DataGridView dataGridView1;
 
+       
 
         public eReferenceType MyName
         {
@@ -183,11 +184,11 @@ namespace CCSee
 
             sDBConnectionString = CCSee.Properties.Settings.Default.ConnectionString;                               // get our connection string value from our XML settings file
             sConnectionUser = CCSee.Properties.Settings.Default.ConnectionUser;                                     // get our user creds
-            sFullConnectionString = sDBConnectionString + sConnectionUser + "Trusted_Connection=False;";                    // Append connection type
+            sFullConnectionString = sDBConnectionString + sConnectionUser + "Trusted_Connection=False;Timeout=180";                    // Append connection type
             sFullConnectionString = Regex.Unescape(sFullConnectionString);
 
             sFullOdenConnectionString = CCSee.Properties.Settings.Default.ConnectionStringLogTek;
-            sFullOdenConnectionString += CCSee.Properties.Settings.Default.ConnectionUserLogTek + "Trusted_Connection=False;";
+            sFullOdenConnectionString += CCSee.Properties.Settings.Default.ConnectionUserLogTek + "Trusted_Connection=False;Timeout=180";
             sFullOdenConnectionString = Regex.Unescape(sFullOdenConnectionString);// unescape
             foreach (string s in Enum.GetNames(typeof(eReferenceType)))
             {
@@ -203,6 +204,7 @@ namespace CCSee
             dgvOut.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvOut.MultiSelect = true;
             dgvOut.BorderStyle = BorderStyle.Fixed3D;
+            dgvOut.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgvUserDetails_RowPostPaint);
 
             //  dgvOut.DefaultCellStyle.SelectionBackColor = Color.Red;
             //  dgvOut.DefaultCellStyle.SelectionForeColor = Color.Black;
@@ -210,7 +212,13 @@ namespace CCSee
             //   dgvOut.DefaultCellStyle.Font.FontFamily, 25, FontStyle.Bold
             //CCUSAA00007487
         }
-
+        private void dgvUserDetails_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            using (SolidBrush b = new SolidBrush(dgvOut.RowHeadersDefaultCellStyle.ForeColor))
+            {
+                e.Graphics.DrawString((e.RowIndex + 1).ToString(), e.InheritedRowStyle.Font, b, e.RowBounds.Location.X + 10, e.RowBounds.Location.Y + 4);
+            }
+        }
         public void ProcessRequest(UENSerchParams sp)
         {
 
@@ -264,7 +272,12 @@ namespace CCSee
                     tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindByAccount));                                        // do this oina  thread so we dont lockup the UI
                     tdRunFillGrid.Start(sValue);
                     break;
+                case eReferenceType.OnOFF:
 
+                    UserOut("On and Offs");
+                    tdRunFillGrid = new Thread(new ParameterizedThreadStart(FindOnOff));                                        // do this oina  thread so we dont lockup the UI
+                    tdRunFillGrid.Start(sp);
+                    break;
             }
            
         }
@@ -298,7 +311,7 @@ namespace CCSee
 */
 
                     string sDate = DateTime.Now.Date.ToString("M /d/yyyy");
-
+                    cmd.CommandTimeout = 120;
                     cmd.CommandText = @"select
                     hdr.AutomationID,
                     hdr.transactionsetid,
@@ -345,7 +358,10 @@ namespace CCSee
                     ClearGrid();
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
-                
+                   if(!reader.HasRows)
+                    {
+                        UserOut(" Sorry, " +System.Security.Principal.WindowsIdentity.GetCurrent().Name + ", No rows for Internal ref: " + sInternalRef);
+                    }
                    
                     sqlConnection.Close();
 
@@ -391,7 +407,7 @@ namespace CCSee
 
                     string sDate = DateTime.Now.Date.ToString("M/d/yyyy");
 
-
+                    cmd.CommandTimeout = 180;
                     cmd.CommandText = @"
 
               
@@ -414,8 +430,11 @@ namespace CCSee
                   //  startWaitingThread();
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
-                  //  stopWaitingThread();
-
+                    //  stopWaitingThread();
+                    if (!reader.HasRows)
+                    {
+                        UserOut(" Sorry, " +  System.Security.Principal.WindowsIdentity.GetCurrent().Name + ", No rows for account ref: " + sAccount);
+                    }
 
 
                     sqlConnection.Close();
@@ -425,6 +444,74 @@ namespace CCSee
                 catch (Exception ex)
                 {
                     UserOut("TagID: " + sAccount + " Exception retrieving data :" + ex.Message);
+                    // return null;
+                }
+
+
+            }
+
+
+        }
+
+        public void FindOnOff(object o)
+        {
+           // string sAccount = (string)o;
+
+            UENSerchParams sp = (UENSerchParams)o;
+
+            SqlDataAdapter dataAdapter = new SqlDataAdapter();
+
+
+            List<DataGridViewRow> ldr = new List<DataGridViewRow>();
+            List<DataGridViewColumn> ldc = new List<DataGridViewColumn>();
+
+            lock (oThreadLock)
+            {
+
+                try
+                {
+                    SqlConnection sqlConnection = new SqlConnection(sFullConnectionString);
+                    SqlCommand cmd = new SqlCommand();
+                    SqlDataReader reader = null;
+
+
+                    DateTime dtNow = DateTime.Now - new TimeSpan(30, 0, 0, 0);
+                    string sDate = dtNow.Date.ToString("M/d/yyyy");
+                    string eDate = DateTime.Now.Date.ToString("M/d/yyyy");
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandTimeout = 180;
+                    cmd.CommandText = @"[dbo].[usp_AccountOnsAndOffs]";
+
+              
+ 
+                    cmd.Parameters.Add("@Account", SqlDbType.VarChar).Value = sp.SRef;
+                    cmd.Parameters.Add("@StartDate", SqlDbType.VarChar).Value = sp.SDate;
+                    cmd.Parameters.Add("@EndDate", SqlDbType.VarChar).Value = sp.EDate;
+
+
+                    //  cmd.CommandType = CommandType.Text;
+                    cmd.Connection = sqlConnection;
+                    sqlConnection.Open();
+
+                    ClearGrid();
+                    //  startWaitingThread();
+                    reader = cmd.ExecuteReader();
+                    reader.NextResult(); // move to second result set
+                    AddReaderRows(reader);
+                    //  stopWaitingThread();
+                    if (!reader.HasRows)
+                    {
+                        UserOut(" Sorry, " + System.Security.Principal.WindowsIdentity.GetCurrent().Name + ", No rows for account ref: " + sp.SRef);
+                    }
+
+
+                    sqlConnection.Close();
+
+                }
+
+                catch (Exception ex)
+                {
+                    UserOut("Account : " + sp.SRef + " Exception retrieving data :" + ex.Message);
                     // return null;
                 }
 
@@ -459,7 +546,7 @@ namespace CCSee
 
                     string sDate = DateTime.Now.Date.ToString("M/d/yyyy");
 
-
+                    cmd.CommandTimeout = 180;
                     cmd.CommandText = @"
 
                 SELECT
@@ -489,8 +576,11 @@ namespace CCSee
                     ClearGrid();
                     reader = cmd.ExecuteReader();
                     AddReaderRows(reader);
+                    if (!reader.HasRows)
+                    {
+                        UserOut(" Sorry, " +  System.Security.Principal.WindowsIdentity.GetCurrent().Name + ", No rows for order ref: " + sInternalRef);
+                    }
 
-                   
 
 
                     sqlConnection.Close();
@@ -530,7 +620,7 @@ namespace CCSee
                     SqlCommand cmd = new SqlCommand();
                     SqlDataReader reader;
 
-
+                    cmd.CommandTimeout = 180;
 
                     string sDate = DateTime.Now.Date.ToString("M/d/yyyy");
 
@@ -647,23 +737,28 @@ namespace CCSee
 
         public void AddReaderRows(SqlDataReader r)
         {
-            if (DgvOut.InvokeRequired)
-            {
-                DgvOut.Invoke((MethodInvoker)delegate ()
-                {
 
+            if (r.HasRows)
+            {
+                if (DgvOut.InvokeRequired)
+                {
+                    DgvOut.Invoke((MethodInvoker)delegate ()
+                    {
+
+                        bindingsource.DataSource = r;
+                        DgvOut.ClearSelection();
+                        DgvOut.Refresh();
+                    });
+
+                }
+                else
+                {
                     bindingsource.DataSource = r;
                     DgvOut.ClearSelection();
                     DgvOut.Refresh();
-                });
-
+                }
             }
-            else
-            {
-                bindingsource.DataSource = r;
-                DgvOut.ClearSelection();
-                DgvOut.Refresh();
-            }
+            
         }
        
         public void ClearGrid()
