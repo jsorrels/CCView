@@ -479,7 +479,7 @@ namespace CCSee
                     string sDate = dtNow.Date.ToString("M/d/yyyy");
                     string eDate = DateTime.Now.Date.ToString("M/d/yyyy");
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.CommandTimeout = 180;
+                    cmd.CommandTimeout = 400;
                     cmd.CommandText = @"[dbo].[usp_AccountOnsAndOffs]";
 
               
@@ -497,7 +497,7 @@ namespace CCSee
                     //  startWaitingThread();
                     reader = cmd.ExecuteReader();
                     reader.NextResult(); // move to second result set
-                    AddReaderRows(reader);
+                 AddReaderRows(reader);
                     //  stopWaitingThread();
                     if (!reader.HasRows)
                     {

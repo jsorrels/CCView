@@ -7,3 +7,12 @@ C:\Users\jim.sorrels\Documents\Source\CCSee\CCSee\bin\Debug\CCSee.pdb
 C:\Users\jim.sorrels\Documents\Source\CCSee\CCSee\obj\Debug\CCSee.exe
 C:\Users\jim.sorrels\Documents\Source\CCSee\CCSee\obj\Debug\CCSee.pdb
 C:\Users\jim.sorrels\Documents\Source\CCSee\CCSee\obj\Debug\CCSee.csprojResolveAssemblyReference.cache
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\bin\Debug\CCSee.exe.config
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.exe
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.pdb
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\bin\Debug\CCSee.exe
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\bin\Debug\CCSee.pdb
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.csprojResolveAssemblyReference.cache
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.Form1.resources
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.Properties.Resources.resources
+C:\Users\jim.sorrels\Google Drive\Source\CCSee\CCSee\obj\Debug\CCSee.csproj.GenerateResource.Cache

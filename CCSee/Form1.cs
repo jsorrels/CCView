@@ -482,6 +482,11 @@ namespace CCSee
         {
 
         }
+
+        private void dgvOut_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 }
  
